@@ -1,0 +1,21 @@
+{% set managed_comment = nginx_php_fpm_status_managed_comment | comment %}
+{% set nginx_status -%}
+{{ managed_comment }}
+location = /nginx-status {
+    stub_status;
+}
+{% endset %}
+{% set locations = {'nginx-status.conf': nginx_status} %}
+{% for pool in nginx_php_fpm_status_pools %}
+{% set filename = 'php' ~ pool.version ~ '-' ~ pool.name ~ '.conf' %}
+{% set location -%}
+{{ managed_comment }}
+location {{ '' if pool.socket is defined else '= ' }}{{ pool.uri }} {
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME {{ pool.uri }};
+    fastcgi_pass {{ pool.fastcgi_address if pool.socket is defined else pool.fastcgi_address | to_json(ensure_ascii=false) }};
+}
+{% endset %}
+{% set _ = locations.update({filename: location}) %}
+{% endfor %}
+{{ locations | to_nice_json(indent=2, sort_keys=false) }}

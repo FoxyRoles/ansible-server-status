@@ -1,0 +1,26 @@
+---
+nginx_php_fpm_status_bind_address: 127.0.0.1
+nginx_php_fpm_status_port: 80
+nginx_php_fpm_status_worker_user: "{{ nginx_user | default(none) }}"
+nginx_php_fpm_status_pool_uri_prefix: /fpm
+nginx_php_fpm_status_socket_dir: /run/php
+
+nginx_php_fpm_status_nginx_main_config: /etc/nginx/nginx.conf
+nginx_php_fpm_status_nginx_default_vhost: /etc/nginx/conf.d/default.conf
+nginx_php_fpm_status_nginx_locations_dir: /etc/nginx/default-vhost.d
+nginx_php_fpm_status_nginx_binary: nginx
+nginx_php_fpm_status_nginx_service: nginx.service
+
+nginx_php_fpm_status_php_dir: /etc/php
+nginx_php_fpm_status_php_bin_dir: /usr/sbin
+nginx_php_fpm_status_php_binary_prefix: php-fpm
+nginx_php_fpm_status_php_service: 'php{version}-fpm.service'
+
+nginx_php_fpm_status_discovery_file: /etc/zabbix/php-fpm-pools.json
+nginx_php_fpm_status_zabbix_config: /etc/zabbix/zabbix_agent2.conf
+nginx_php_fpm_status_zabbix_userparameter_file: /etc/zabbix/zabbix_agent2.d/php-fpm.conf
+nginx_php_fpm_status_zabbix_binary: zabbix_agent2
+nginx_php_fpm_status_zabbix_service: zabbix-agent2.service
+
+nginx_php_fpm_status_lock_file: /run/lock/ansible-nginx-php-fpm-status.lock
+nginx_php_fpm_status_managed_comment: "{{ ansible_managed | default('Ansible managed') }}"

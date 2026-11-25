@@ -1,0 +1,45 @@
+---
+- name: Discover PHP-FPM pools
+  nginx_php_fpm_status:
+    <<: &pool_discovery_options
+      worker_user: "{{ nginx_php_fpm_status_worker_user | default(omit, true) }}"
+      pool_uri_prefix: "{{ nginx_php_fpm_status_pool_uri_prefix }}"
+      socket_dir: "{{ nginx_php_fpm_status_socket_dir }}"
+      nginx_main_config: "{{ nginx_php_fpm_status_nginx_main_config }}"
+      nginx_binary: "{{ nginx_php_fpm_status_nginx_binary }}"
+      php_dir: "{{ nginx_php_fpm_status_php_dir }}"
+      php_bin_dir: "{{ nginx_php_fpm_status_php_bin_dir }}"
+      php_binary_prefix: "{{ nginx_php_fpm_status_php_binary_prefix }}"
+      managed_comment: "{{ nginx_php_fpm_status_managed_comment }}"
+    operation: discover
+  register: nginx_php_fpm_status_plan
+
+- name: Apply and validate nginx, PHP-FPM and Zabbix status configuration
+  nginx_php_fpm_status:
+    <<: *pool_discovery_options
+    operation: apply
+    bind_address: "{{ nginx_php_fpm_status_bind_address }}"
+    port: "{{ nginx_php_fpm_status_port }}"
+    nginx_default_vhost: "{{ nginx_php_fpm_status_nginx_default_vhost }}"
+    nginx_locations_dir: "{{ nginx_php_fpm_status_nginx_locations_dir }}"
+    nginx_service: "{{ nginx_php_fpm_status_nginx_service }}"
+    php_service: "{{ nginx_php_fpm_status_php_service }}"
+    zabbix_config: "{{ nginx_php_fpm_status_zabbix_config }}"
+    zabbix_userparameter_file: "{{ nginx_php_fpm_status_zabbix_userparameter_file }}"
+    zabbix_binary: "{{ nginx_php_fpm_status_zabbix_binary }}"
+    zabbix_service: "{{ nginx_php_fpm_status_zabbix_service }}"
+    lock_file: "{{ nginx_php_fpm_status_lock_file }}"
+    pools: "{{ nginx_php_fpm_status_pools }}"
+    nginx_config: "{{ lookup('ansible.builtin.template', 'default.conf.j2') }}"
+    nginx_locations: >-
+      {{ nginx_php_fpm_status_locations_json | from_json
+         if nginx_php_fpm_status_locations_json is string else nginx_php_fpm_status_locations_json }}
+    discovery_file: "{{ nginx_php_fpm_status_discovery_file }}"
+    discovery: >-
+      {{ nginx_php_fpm_status_discovery_json | from_json
+         if nginx_php_fpm_status_discovery_json is string else nginx_php_fpm_status_discovery_json }}
+    zabbix_userparameter: "{{ lookup('ansible.builtin.template', 'php-fpm.conf.j2') | trim }}"
+  vars:
+    nginx_php_fpm_status_pools: "{{ nginx_php_fpm_status_plan.pools }}"
+    nginx_php_fpm_status_locations_json: "{{ lookup('ansible.builtin.template', 'nginx-locations.json.j2') }}"
+    nginx_php_fpm_status_discovery_json: "{{ lookup('ansible.builtin.template', 'php-fpm-pools.json.j2') }}"

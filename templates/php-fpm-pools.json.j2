@@ -1,0 +1,10 @@
+{% set entries = [] %}
+{% for pool in nginx_php_fpm_status_pools %}
+{% set _ = entries.append({
+    '{#FPM.ID}': 'php' ~ (pool.version | replace('.', '')) ~ '-' ~ pool.name,
+    '{#FPM.VERSION}': pool.version,
+    '{#FPM.POOL}': pool.name,
+    '{#FPM.PATH}': pool.uri[1:]
+}) %}
+{% endfor %}
+{{ entries | to_nice_json(indent=2, sort_keys=false) }}
