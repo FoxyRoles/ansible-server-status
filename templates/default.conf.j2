@@ -6,7 +6,7 @@ server {
 
     access_log off;
 
-    include {{ (nginx_php_fpm_status_nginx_locations_dir.rstrip('/') ~ '/*.conf') | to_json(ensure_ascii=false) }};
+    include {{ nginx_php_fpm_status_nginx_locations_dir.rstrip('/') ~ '/*.conf' }};
 
     location / {
         return 404;
