@@ -1,7 +1,7 @@
 {{ nginx_php_fpm_status_managed_comment | comment }}
 {% set address = nginx_php_fpm_status_bind_address %}
 server {
-    listen {{ '[' ~ address ~ ']' if ':' in address else address }}:{{ nginx_php_fpm_status_port }} default_server;
+    listen {{ '[' ~ address ~ ']' if ':' in address else address }}:{{ nginx_php_fpm_status_port }};
     server_name localhost;
 
     access_log off;
