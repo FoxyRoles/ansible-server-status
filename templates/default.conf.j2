@@ -1,4 +1,4 @@
-{{ nginx_php_fpm_status_managed_comment | comment }}
+{{ nginx_php_fpm_status_managed_comment | comment(prefix='', postfix='') | trim }}
 {% set address = nginx_php_fpm_status_bind_address %}
 server {
     listen {{ '[' ~ address ~ ']' if ':' in address else address }}:{{ nginx_php_fpm_status_port }};

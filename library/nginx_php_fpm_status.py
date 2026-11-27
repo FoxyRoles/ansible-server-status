@@ -18,6 +18,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 ROLE_MARKER = 'Role: sunfoxcz.server-status'
 LEGACY_MARKER = 'Ansible: nginx-php-fpm-status'
+LISTEN_OWNER_MARKER = '; Ansible Managed: sunfoxcz.server-status'
 
 # Keep quoted strings, escaped characters and ${variables} intact when parsing directives.
 NGINX_TOKEN = re.compile(
@@ -157,14 +158,19 @@ def configure_pool(lines, version, pool, options):
     kept = [lines[0]]
     idle = None
     active_idle = None
-    for line in lines[1:]:
+    for previous, line in zip(lines, lines[1:]):
+        if line.strip() == LISTEN_OWNER_MARKER:
+            continue
         setting = ASSIGNMENT.match(line.rstrip('\r\n'))
         if setting:
             key, value = setting.groups()
             key = key.lower()
             if key in ('pm.status_path', 'pm.status_listen'):
                 continue
-            if key == 'listen.owner' and line.rstrip().endswith(('; ' + ROLE_MARKER, '; ' + LEGACY_MARKER)):
+            if key == 'listen.owner' and (
+                previous.strip() == LISTEN_OWNER_MARKER
+                or line.rstrip().endswith(('; ' + ROLE_MARKER, '; ' + LEGACY_MARKER))
+            ):
                 continue
             settings[key] = value.split(';', 1)[0].strip().strip('\"\'')
         anchor = IDLE_TIMEOUT.match(line)
@@ -194,8 +200,7 @@ def configure_pool(lines, version, pool, options):
         # TCP pools can set a status socket owner without changing the application listener.
         listen = settings.get('listen', '')
         if re.fullmatch(r'(?:[^/]*:)?[0-9]+', listen) and not LISTEN_OWNERSHIP.intersection(settings):
-            comment = ' '.join(options['managed_comment'].splitlines())
-            directives.append('listen.owner = {}; {}; {}'.format(options['worker_user'], comment, ROLE_MARKER))
+            directives.extend([LISTEN_OWNER_MARKER, 'listen.owner = ' + options['worker_user']])
     kept[position:position] = [indent + directive + newline for directive in directives]
     return kept, endpoint
 
@@ -510,7 +515,6 @@ def main():
             'php_dir': {'type': 'path', 'required': True},
             'php_bin_dir': {'type': 'path', 'required': True},
             'php_binary_prefix': {'type': 'str', 'required': True},
-            'managed_comment': {'type': 'str', 'required': True},
             'pools': {'type': 'list', 'elements': 'dict'},
             'nginx_config': {'type': 'str'},
             'nginx_locations': {'type': 'dict'},

@@ -1,0 +1,27 @@
+---
+
+galaxy_info:
+  namespace: sunfoxcz
+  role_name: server-status
+  author: Tomas Jacik
+  description: Configure nginx and PHP-FPM status endpoints and Zabbix Agent 2 discovery.
+  company: sunfoxcz
+  min_ansible_version: '2.19'
+  platforms:
+    - name: Debian
+      versions:
+        - bookworm
+        - trixie
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+        - noble
+        - resolute
+  galaxy_tags:
+    - nginx
+    - php
+    - zabbix
+    - monitoring
+
+dependencies: []

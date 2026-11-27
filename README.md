@@ -42,10 +42,13 @@ using distinct filenames.
 
 ## Requirements
 
+The role requires `ansible-core` 2.19 or newer.
+
 Run the role with `become: true` on a systemd host with nginx and Zabbix Agent 2
 already installed. The role validates configuration, reloads or restarts
 services as needed, and attempts to roll back changes if application fails.
 See [defaults/main.yml](defaults/main.yml) for paths, executables, and systemd
 unit names. The PHP-FPM unit name pattern replaces `{version}` with the
-installed PHP major and minor version. Set `ansible_managed` to customize
-the managed-file comment.
+installed PHP major and minor version. Set `nginx_php_fpm_status_managed_comment`
+to override `ansible_managed` for this role. The inventory default includes
+source metadata in templated nginx files.

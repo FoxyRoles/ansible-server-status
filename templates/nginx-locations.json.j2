@@ -1,4 +1,4 @@
-{% set managed_comment = nginx_php_fpm_status_managed_comment | comment %}
+{% set managed_comment = nginx_php_fpm_status_managed_comment | comment(prefix='', postfix='') | trim %}
 {% set nginx_status -%}
 {{ managed_comment }}
 location = /nginx-status {

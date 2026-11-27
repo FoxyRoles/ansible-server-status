@@ -10,7 +10,6 @@
       php_dir: "{{ nginx_php_fpm_status_php_dir }}"
       php_bin_dir: "{{ nginx_php_fpm_status_php_bin_dir }}"
       php_binary_prefix: "{{ nginx_php_fpm_status_php_binary_prefix }}"
-      managed_comment: "{{ nginx_php_fpm_status_managed_comment }}"
     operation: discover
   register: nginx_php_fpm_status_plan
 
